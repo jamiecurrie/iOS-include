@@ -6,6 +6,8 @@
 //  Copyright © 2016 Big Dog Agency. All rights reserved.
 //
 
+import UIKit
+
 extension NSDate {
     
     func numberOfDaysUntilDateTime(toDateTime: NSDate, inTimeZone timeZone: NSTimeZone? = nil) -> Int {
