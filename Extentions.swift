@@ -78,3 +78,22 @@ extension UIColor {
         self.init(red:(netHex >> 16) & 0xff, green:(netHex >> 8) & 0xff, blue:netHex & 0xff)
     }
 }
+
+extension NSData {
+    
+    
+    func getDictionaryFromJsonData () -> NSDictionary {
+        if let parsedObject: AnyObject? = try? NSJSONSerialization.JSONObjectWithData(self, options: []) {
+            if let dictionary = parsedObject as? NSDictionary {
+                
+                return dictionary
+            } else {
+                print("📂 <\(#function)> ERROR: Unable to parse as dictionay")
+            }
+        } else {
+            print("📂 <\(#function)> ERROR: NSJSONSerialization failed")
+        }
+        return [:]
+    }
+    
+}
