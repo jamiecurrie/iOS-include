@@ -10,32 +10,33 @@ import Foundation
 
 class ErrorLogger {
     
-    var session = URLSession.shared
-    let endpoint = URL(string: "https://bigdogcloud.co.uk/api/ios/errorlogger.php")
-    let appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
+    var session = NSURLSession.sharedSession()
+    let endpoint = NSURL(string: "https://bigdogcloud.co.uk/api/ios/errorlogger.php")
+    let appName = "Rolls-Royce"
     
     
     // Call like this -> ErrorLogger().log(self.dynamicType, funcRef: #function, errorRef: "\(error)")
-    func log(_ classRef: AnyClass, funcRef: String, errorRef: String) {
+    func log(classRef: AnyClass, funcRef: String, errorRef: String) {
         
-        let logMessage = "App:\n         - \(appName)\n\nClass:\n         - \(classRef)\n\nFunction:\n         - \(funcRef)\n\nError:\n         - \(errorRef)"
+        let logMessage = "<CLASS> \(classRef)\n<FUNCTION> \(funcRef)\n<ERROR> \(errorRef)"
+        print("🚨 ErrorLogger:\n\(logMessage)")
         
         let request = NSMutableURLRequest()
-        request.url = endpoint
-        request.httpMethod = "POST"
+        request.URL = endpoint
+        request.HTTPMethod = "POST"
         let postString = "app=\(appName)&log=\(logMessage)"
-        request.httpBody = postString.data(using: String.Encoding.utf8)
-
-        let task = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) in
+        request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
+        
+        let task = session.dataTaskWithRequest(request) { (data, response, error) in
             
             if (error != nil) {
                 print("🚨 ErrorLogger: \(error)")
             } else {
-                if let stringData = NSString.init(data: data!, encoding: String.Encoding.utf8.rawValue) {
+                if let stringData = NSString.init(data: data!, encoding: NSUTF8StringEncoding) {
                     print("🚨 ErrorLogger: \(stringData)")
                 }
             }
-        }) 
+        }
         
         task.resume()
     }
