@@ -153,7 +153,6 @@ extension UIColor {
         self.init(red:(netHex >> 16) & 0xff, green:(netHex >> 8) & 0xff, blue:netHex & 0xff)
     }
 }
-<<<<<<< HEAD
 
 extension Data {
     
@@ -173,6 +172,3 @@ extension Data {
     }
     
 }
-
-=======
->>>>>>> parent of e260517... minor tweaks removed endpoint
