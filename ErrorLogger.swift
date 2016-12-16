@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ErrorLogger {
     
@@ -15,10 +16,28 @@ class ErrorLogger {
     let appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
     
     
-    // Call like this -> ErrorLogger().log(self.dynamicType, funcRef: #function, errorRef: "\(error)")
-    func log(_ classRef: AnyClass, funcRef: String, errorRef: String) {
+    /* 
+     
+     Usage:
+     
+     ErrorLogger().log(userRef: "\(USER)", sender: self, funcRef: #function, errorRef: "\(error)")
+
+     */
+    func log(userRef: String, sender: Any, funcRef: String, errorRef: String) {
         
-        let logMessage = "App:\n         - \(appName)\n\nClass:\n         - \(classRef)\n\nFunction:\n         - \(funcRef)\n\nError:\n         - \(errorRef)"
+        print("🚨 ErrorLogger: \(errorRef)")
+
+        let classRef = type(of: sender)
+        let info: NSDictionary = (Bundle.main.infoDictionary)! as NSDictionary
+        let model = UIDevice.current.modelName
+        let OS = UIDevice.current.systemVersion
+
+        let logMessage = "User:\n         - \(userRef)\n\n" +
+                         "Device:\n         -Model: \(model), iOS: \(OS)\n\n" +
+                         "App:\n         - \(appName) (\(info.object(forKey: "CFBundleShortVersionString")!) (\(info.object(forKey: "CFBundleVersion")!)))\n\n" +
+                         "Class:\n         - \(classRef)\n\n" +
+                         "Function:\n         - \(funcRef)\n\n" +
+                         "Error:\n         - \(errorRef)"
         
         let request = NSMutableURLRequest()
         request.url = endpoint
@@ -29,7 +48,7 @@ class ErrorLogger {
         let task = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) in
             
             if (error != nil) {
-                print("🚨 ErrorLogger: \(error)")
+                print("🚨 ErrorLogger: failed = \(error!.localizedDescription)")
             } else {
                 if let stringData = NSString.init(data: data!, encoding: String.Encoding.utf8.rawValue) {
                     print("🚨 ErrorLogger: \(stringData)")

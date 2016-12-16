@@ -9,6 +9,9 @@
 import Foundation
 import SystemConfiguration
 
+let CONNECTION_LOST = "CONNECTION_LOST"
+let CONNECTION_FOUND = "CONNECTION_FOUND"
+
 open class ConnectionDeamon {
     
     var loop: Timer!
@@ -31,13 +34,13 @@ open class ConnectionDeamon {
             if (connected) {
                 print("😈 CONNECTION_LOST")
                 connected = false
-                self.events.trigger("CONNECTION_LOST")
+                self.events.trigger(CONNECTION_LOST)
             }
         } else {
             if (!connected) {
                 print("😈 CONNECTION_FOUND")
                 connected = true
-                self.events.trigger("CONNECTION_FOUND")
+                self.events.trigger(CONNECTION_FOUND)
             }
         }
     }

@@ -8,7 +8,93 @@
 
 import UIKit
 
-public extension UIDevice {
+extension UIWebView {
+    
+    @discardableResult func javaScript(functionName: String, args: [Any]?) -> String? {
+        
+        var arrayString = ""
+        
+        if args != nil {
+            
+            for arg in args! {
+                arrayString += "'\(arg)',"
+            }
+            
+            arrayString = arrayString.substring(to: arrayString.index(before: arrayString.endIndex))
+        }
+        
+        let javaScriptString = "\(functionName)(\(arrayString))"
+        print("📄 \(javaScriptString)")
+        return stringByEvaluatingJavaScript(from: javaScriptString)
+    }
+}
+
+extension URLCache {
+    
+    func clear() {
+        URLCache.shared.removeAllCachedResponses()
+        URLCache.shared.diskCapacity = 0
+        URLCache.shared.memoryCapacity = 0
+    }
+}
+
+extension UIDocumentInteractionController {
+    
+    convenience init(request: URL) {
+        
+        self.init()
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        print("\(request)")
+        
+        URLSession.shared.downloadTask(with: request) {url, responce, error in
+            
+            if (error == nil) {
+                
+                let httpResponse = responce as! HTTPURLResponse
+                
+                if httpResponse.statusCode == 200 {
+                    
+                    do {
+                        
+                        let fileURLString = "file://\(UIDevice.current.documentsDirectory)/temp.pdf"
+                        let FileURL = NSURL(string: fileURLString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!)! as URL
+                        
+                        try? FileManager.default.removeItem(at: FileURL)
+                        try FileManager.default.moveItem(at: url! as URL, to: FileURL)
+                        
+                        self.url = FileURL
+                        
+                    } catch let error as NSError {
+                        print(error.localizedDescription)
+                    }
+                    
+                }
+            } else {
+                print("❗️\(error!.localizedDescription)")
+            }
+            
+            semaphore.signal()
+            
+            }.resume()
+        
+        semaphore.wait()
+        
+        
+        
+    }
+}
+
+extension UIDevice {
+    
+    
+    var documentsDirectory: String {
+        
+        let documentsDirectory = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
+        
+        return documentsDirectory
+    }
     
     var modelName: String {
         var systemInfo = utsname()
@@ -125,7 +211,6 @@ extension Date {
             return date
         } else {
             print("❗️ Couldn't covert to NSDate: \(dateString)")
-            ErrorLogger().log(type(of: self) as! AnyClass, funcRef: #function, errorRef: "Couldn't covert to NSDate: \(dateString)")
             return Date()
         }
     }
